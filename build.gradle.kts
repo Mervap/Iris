@@ -8,8 +8,11 @@ buildscript {
         val kotlinVersion = "1.6.21"
         classpath(kotlin("gradle-plugin", version = kotlinVersion))
         classpath(kotlin("serialization", version = kotlinVersion))
-        classpath("com.android.tools.build:gradle:7.2.0")
+        classpath("com.android.tools.build:gradle:7.2.1")
         classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
+        classpath("com.google.gms:google-services:4.3.10")
+        classpath("com.codingfeline.buildkonfig:buildkonfig-gradle-plugin:0.12.0")
+        classpath("com.rickclephas.kmp:kmp-nativecoroutines-gradle-plugin:0.12.2")
     }
 }
 

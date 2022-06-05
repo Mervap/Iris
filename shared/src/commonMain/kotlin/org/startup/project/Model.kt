@@ -3,11 +3,13 @@ package org.startup.project
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
+typealias UID = String
 
 @Serializable
 data class User(
   val name: String,
   val age: Int,
+  val uid: UID = ""
 )
 
 @Serializable
@@ -15,6 +17,7 @@ data class Tag(
   val title: String,
   val description: String,
   val color: String,
+  val uid: UID = ""
 )
 
 @Serializable
@@ -26,7 +29,7 @@ enum class InvolvementState {
 
 @Serializable
 data class Involvement(
-  val user: User,
+  val userUID: UID,
   val state: InvolvementState,
 )
 
@@ -42,7 +45,6 @@ data class Event(
   val description: String,
   val position: LatLng,
   val time: LocalDateTime,
-  val author: User,
-  val involvements: List<Involvement>,
-  val tags: List<Tag>
+  val authorUID: UID,
+  val uid: UID = "",
 )

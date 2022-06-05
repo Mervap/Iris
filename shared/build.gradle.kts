@@ -1,9 +1,15 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+val composeVersion = "1.2.0-beta02"
 
 plugins {
     kotlin("multiplatform")
-    id("com.android.library")
     kotlin("plugin.serialization")
+    id("com.android.library")
+    id("com.codingfeline.buildkonfig")
+    id("com.rickclephas.kmp.nativecoroutines")
 }
 
 kotlin {
@@ -15,6 +21,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach {
         it.binaries.framework {
+            isStatic = true
             baseName = "shared"
         }
     }
@@ -24,6 +31,8 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
+                implementation("dev.gitlive:firebase-database:1.6.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
             }
         }
         val commonTest by getting {
@@ -34,6 +43,8 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation("com.google.android.gms:play-services-maps:18.0.2")
+                implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
+                implementation("androidx.compose.ui:ui:$composeVersion")
             }
         }
 
@@ -55,6 +66,15 @@ android {
     defaultConfig {
         minSdk = 27
         targetSdk = 32
+    }
+}
+
+buildkonfig {
+    packageName = "org.startup.project.firebase"
+    objectName = "FirebaseProperties"
+
+    defaultConfigs {
+        buildConfigField(STRING, "dbUrl", gradleLocalProperties(rootDir).getProperty("FIREBASE_DATABASE"))
     }
 }
 

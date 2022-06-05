@@ -24,10 +24,15 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.*
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import org.startup.project.InvolvementState
-import org.startup.project.fetchEvents
+import org.startup.project.android.compose.FlowMarkerInfoContent
+import org.startup.project.firebase.DB
+import org.startup.project.firebase.involvements
+import org.startup.project.firebase.tags
+import org.startup.project.firebase.user
 import org.startup.project.hexToHue
 import org.startup.project.toGMS
 
@@ -85,7 +90,12 @@ fun GoogleMapView(
     mutableStateOf(MapProperties(mapType = MapType.NORMAL))
   }
 
-  val events = fetchEvents().map { it to rememberMarkerState(position = it.position.toGMS()) }
+  val events by DB.selectAllEvents().collectAsStateLifecycleAware(emptyList()) { events ->
+    events.map { event ->
+      event to event.tags().firstOrNull()?.firstOrNull()?.color?.let { hexToHue(it) }
+    }
+  }
+
   GoogleMap(
     modifier = modifier,
     cameraPositionState = cameraPositionState,
@@ -93,20 +103,28 @@ fun GoogleMapView(
     uiSettings = uiSettings,
     onMapLoaded = onMapLoaded
   ) {
-    // Drawing on the map is accomplished with a child-based API
-    val markerClick: (Marker) -> Boolean = {
-      cameraPositionState.projection?.let {
+    for ((event, tagColor) in events) {
+      val actualFlowProducer = {
+        event.involvements().map { involvements ->
+          involvements.map {
+            val color = when (it.state) {
+              InvolvementState.DECLINED -> Color.Red
+              InvolvementState.MAYBE -> Color.Yellow
+              InvolvementState.ACCEPTED -> Color.Green
+            }
+            val user = it.user().name
+            color to user
+          }.toList()
+        }
       }
-      false
-    }
-    events.forEach { (event, state) ->
-      val tagColor = event.tags.firstOrNull()?.color?.let { hexToHue(it) }
-      MarkerInfoWindowContent(
-        state = state,
+
+      FlowMarkerInfoContent(
+        actualFlowProducer = actualFlowProducer,
+        default = null,
+        state = rememberMarkerState(position = event.position.toGMS()),
         title = event.title,
         icon = tagColor,
-        onClick = markerClick,
-      ) {
+      ) { involvements, _ ->
         Column {
           Text(
             event.title,
@@ -119,14 +137,17 @@ fun GoogleMapView(
           Spacer(modifier = Modifier.height(5.dp))
 
           Row {
-            event.involvements.forEach {
-              val color = when (it.state) {
-                InvolvementState.DECLINED -> Color.Red
-                InvolvementState.MAYBE -> Color.Yellow
-                InvolvementState.ACCEPTED -> Color.Green
-              }
-              Box(Modifier.background(color).padding(3.dp)) {
-                Text(it.user.name)
+            if (involvements == null) {
+              Text("Loading list of involvements...", fontWeight = FontWeight.ExtraLight)
+              return@Row
+            }
+            involvements.forEach { (color, name) ->
+              Box(
+                Modifier
+                  .background(color)
+                  .padding(3.dp)
+              ) {
+                Text(name)
               }
               Spacer(modifier = Modifier.width(5.dp))
             }

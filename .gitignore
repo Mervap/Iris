@@ -9,3 +9,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+iosApp/iosApp/GoogleService-Info.plist
+androidApp/google-services.json
