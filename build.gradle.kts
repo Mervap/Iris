@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         val kotlinVersion = "1.6.21"
-        classpath(kotlin("gradle-plugin", version = kotlinVersion))
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
         classpath(kotlin("serialization", version = kotlinVersion))
         classpath("com.android.tools.build:gradle:7.2.1")
         classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
