@@ -8,9 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -28,6 +26,7 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import org.startup.project.InvolvementState
+import org.startup.project.android.actions.newEvent.NewEvent
 import org.startup.project.android.compose.FlowMarkerInfoContent
 import org.startup.project.firebase.DB
 import org.startup.project.firebase.involvements
@@ -56,8 +55,10 @@ class MainActivity : ComponentActivity() {
           cameraPositionState = cameraPositionState,
           onMapLoaded = {
             isMapLoaded = true
-          },
+          }
         )
+        NewEvent(cameraPositionState)
+
         if (!isMapLoaded) {
           AnimatedVisibility(
             modifier = Modifier.matchParentSize(),
@@ -138,7 +139,10 @@ fun GoogleMapView(
 
           Row {
             if (involvements == null) {
-              Text("Loading list of involvements...", fontWeight = FontWeight.ExtraLight)
+              Text(
+                "Loading list of involvements...",
+                fontWeight = FontWeight.ExtraLight
+              )
               return@Row
             }
             involvements.forEach { (color, name) ->
