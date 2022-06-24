@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -24,6 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.maps.android.compose.CameraPositionState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDateTime
 import org.startup.project.Event
@@ -159,7 +163,7 @@ private fun AddEventDescription(
             authorUID = "FOjhYBQConceE2iRVRaAlREVIS93"
           )
 
-          runBlocking {
+          CoroutineScope(Main).launch {
             DB.insertEvent(event)
           }
 
