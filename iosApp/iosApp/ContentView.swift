@@ -31,7 +31,7 @@ class ViewController: UIViewController {
               let tag = try await asyncFunction(for: Wrapper().singleTagNative(event: event))
               marker.title = event.title
               marker.snippet = event.description_
-              marker.icon = GMSMarker.markerImage(with: self.hexStringToUIColor(hex: tag.unsafelyUnwrapped.color))
+              marker.icon = GMSMarker.markerImage(with: self.hexStringToUIColor(hex: tag?.color))
               marker.map = self.mapView
             } catch {
               print("Failed with error: \(error)")
@@ -41,8 +41,11 @@ class ViewController: UIViewController {
       }
   }
     
-  func hexStringToUIColor(hex: String) -> UIColor {
-    var cString = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+  func hexStringToUIColor(hex: String?) -> UIColor {
+    if (hex == nil) {
+      return UIColor.red
+    }
+    var cString = hex.unsafelyUnwrapped.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
 
     if (cString.hasPrefix("#")) {
       cString.remove(at: cString.startIndex)
